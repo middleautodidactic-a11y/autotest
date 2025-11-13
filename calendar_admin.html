@@ -55,23 +55,33 @@ header nav a:hover {
   border-radius: 8px;
 }
 
-/* ===== Buttons ===== */
-#btnAddEvent {
-  display: inline-block;
-  margin: 15px auto;
-  padding: 10px 20px;
-  background: #c00;
-  color: #fff;
-  font-weight: bold;
+/* ===== Search ===== */
+#searchBar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 15px;
+}
+#jobSearch {
+  width: 220px;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+}
+#btnSearch, #btnReport {
   border: none;
   border-radius: 8px;
-  cursor: pointer;
-  transition: 0.3s;
+  padding: 8px 16px;
   font-size: 15px;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
-  text-decoration: none;
+  cursor: pointer;
+  font-weight: bold;
 }
-#btnAddEvent:hover { background: #a00; }
+#btnSearch { background-color: #c00; color: white; }
+#btnSearch:hover { background-color: #a00; }
+#btnReport { background-color: #555; color: white; }
+#btnReport:hover { background-color: #333; }
 
 /* ===== Calendar ===== */
 #calendar {
@@ -124,14 +134,13 @@ footer {
   font-size: 14px;
   box-shadow: 0 -3px 6px rgba(0,0,0,0.1);
 }
-/* ====== ปุ่ม Dropdown ====== */
-/* ===== Dropdown (แสดงด้านซ้าย) ===== */
+
+/* ===== Dropdown ===== */
 .dropdown {
   position: relative;
   display: block;
-  left: 0; /* ให้ชิดซ้าย */
+  left: 0;
 }
-
 .dropbtn {
   background-color: #c00;
   color: white;
@@ -141,19 +150,17 @@ footer {
   border-radius: 8px;
   cursor: pointer;
 }
-
 .dropdown-content {
   display: none;
   position: absolute;
-  left: 0; /* ✅ แสดงเมนูทางซ้าย */
-  top: 100%; /* แสดงใต้ปุ่ม */
+  left: 0;
+  top: 100%;
   background-color: #fff;
   min-width: 180px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.15);
   border-radius: 8px;
   z-index: 1000;
 }
-
 .dropdown-content a {
   color: #333;
   padding: 10px 16px;
@@ -161,15 +168,8 @@ footer {
   display: block;
   transition: background 0.2s;
 }
-
-.dropdown-content a:hover {
-  background-color: #f0f0f0;
-}
-
-.dropdown:hover .dropdown-content {
-  display: block;
-}
-
+.dropdown-content a:hover { background-color: #f0f0f0; }
+.dropdown:hover .dropdown-content { display: block; }
 
 /* ====== Responsive (มือถือ / จอเล็ก) ====== */
 @media (max-width: 600px), (orientation: portrait), (orientation: landscape) {
@@ -223,20 +223,17 @@ footer {
     display: none;
   }
 }
-
-
 </style>
 </head>
 <body>
 
 <header>
-
   <div class="logo-container">
-    <img src="ad_logo-Photoroom.png" a href="index.html">
+    <img src="ad_logo-Photoroom.png" alt="logo">
   </div>
   <div style="font-size:18px;">📅 ปฏิทินงาน (SALES & ADMIN)</div>
-  
-  <!-- Dropdown Menu สำหรับมือถือ -->
+
+  <!-- Dropdown Menu -->
   <div class="dropdown">
     <button class="dropbtn">☰ เมนู</button>
     <div class="dropdown-content">
@@ -246,13 +243,20 @@ footer {
     </div>
   </div>
 
-  <!-- ปุ่มแนวนอน (จะซ่อนเมื่อจอเล็ก) -->
+  <!-- ปุ่มแนวนอน -->
   <nav class="nav-buttons">
-    <a href="manage.html" class="button">➕ เพิ่มงาน</a>
-    <a href="admin.html" class="button">📋 จัดการงาน</a>
-    <a href="index.html" class="button">🚪 ออกจากระบบ</a>
+    <a href="manage.html">➕ เพิ่มงาน</a>
+    <a href="admin.html">📋 จัดการงาน</a>
+    <a href="index.html">🚪 ออกจากระบบ</a>
   </nav>
 </header>
+
+<!-- ✅ Search Bar -->
+<div id="searchBar">
+  <input type="text" id="jobSearch" placeholder="🔍 ค้นหาเลขที่งาน (Job Number)">
+  <button id="btnSearch">ค้นหา</button>
+  <button id="btnReport">ดูรายงาน</button>
+</div>
 
 <div id="calendar"></div>
 
@@ -276,7 +280,6 @@ const db = getFirestore(app);
 
 document.addEventListener("DOMContentLoaded", async function() {
   const calendarEl = document.getElementById("calendar");
-
   const calendar = new FullCalendar.Calendar(calendarEl, {
     locale: "th",
     initialView: window.innerWidth < 600 ? "listWeek" : "dayGridMonth",
@@ -296,18 +299,15 @@ document.addEventListener("DOMContentLoaded", async function() {
         el.innerHTML = `<strong>${arg.event.title}</strong><br>
           <small>📍 ${data.location || "-"}</small><br>
           <small>🧰 ${data.jobTypes || "-"}</small><br>
-          <small>📌 ${data.status || "-"}</small>`;
+          <small>📌 ${data.status || "-"}</small><br>
+          <small>🧾 Job: ${data.jobNumber || "-"}</small>`;
       }
       return { domNodes: [el] };
     },
-
-    // ✅ เมื่อคลิกอีเวนต์ในปฏิทิน
     eventClick: function(info) {
-  const event = info.event;
-  const id = event.id;
-  window.location.href = `manage.html?id=${id}`;
-},
-
+      const id = info.event.id;
+      window.location.href = `manage.html?id=${id}`;
+    },
     windowResize: function(){
       if(window.innerWidth < 600){
         calendar.changeView('listWeek');
@@ -317,8 +317,7 @@ document.addEventListener("DOMContentLoaded", async function() {
     }
   });
 
-  // Load events from Firebase
-  const events = [];
+  const allEvents = [];
   try {
     const eventSnap = await getDocs(collection(db,"events"));
     const leaveSnap = await getDocs(collection(db,"leaves"));
@@ -337,18 +336,15 @@ document.addEventListener("DOMContentLoaded", async function() {
       else if(data.status==="เรียบร้อย") color="green";
       else if(data.status==="ไม่เรียบร้อย") color="darkred";
 
-      events.push({
+      allEvents.push({
         id: docItem.id,
         title: Array.isArray(data.workers)?data.workers.join(", "):(data.workers||"ไม่ระบุ"),
         start: data.start||"",
         end: addOneDay(data.end),
         location: data.location||"",
-        details: data.details||"",
-        assignedBy: Array.isArray(data.assigners)?data.assigners.join(", "):(data.assigners||"-"),
         jobTypes: Array.isArray(data.jobTypes)?data.jobTypes.join(", "):(data.jobTypes||"-"),
         jobNumber: data.jobNumber||"-",
         status: data.status||"รออนุมัติ",
-        remark: data.remark||"",
         backgroundColor: color,
         borderColor: color,
         type: "event"
@@ -357,7 +353,7 @@ document.addEventListener("DOMContentLoaded", async function() {
 
     leaveSnap.forEach(docItem=>{
       const data = docItem.data();
-      events.push({
+      allEvents.push({
         id:"leave-"+docItem.id,
         title:data.name||"-",
         start:data.start||"",
@@ -371,8 +367,41 @@ document.addEventListener("DOMContentLoaded", async function() {
       });
     });
 
-    calendar.addEventSource(events);
+    calendar.addEventSource(allEvents);
     calendar.render();
+
+ // ฟังก์ชันค้นหา Job Number
+document.getElementById("btnSearch").addEventListener("click", ()=>{
+  const keyword = document.getElementById("jobSearch").value.trim().toLowerCase();
+
+  if(!keyword) {
+    // ถ้าไม่กรอก ให้แสดงทั้งหมด
+    calendar.removeAllEvents();
+    calendar.addEventSource(allEvents);
+    return;
+  }
+
+  // filter จาก allEvents ไม่ว่าจะอยู่เดือนไหน
+  const filtered = allEvents.filter(e => e.jobNumber && e.jobNumber.toLowerCase().includes(keyword));
+
+  if(filtered.length === 0){
+    alert("❌ ไม่พบงานนี้");
+    return;
+  }
+
+  calendar.removeAllEvents();
+  calendar.addEventSource(filtered);
+
+  // เปลี่ยน view ให้เห็น event ที่ค้นหา
+  calendar.changeView(window.innerWidth < 600 ? "listWeek" : "dayGridMonth");
+
+  // เลือกวันที่ event แรก เพื่อเลื่อน view ไปหา
+  const firstEvent = filtered[0];
+  if(firstEvent.start){
+    calendar.gotoDate(firstEvent.start);
+  }
+});
+
 
   } catch(err){
     console.error("❌ โหลดข้อมูลจาก Firebase ไม่สำเร็จ:",err);
