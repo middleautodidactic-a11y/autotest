@@ -1,0 +1,14 @@
+--------------- EMAIL ------------------------
+
+middle.autodidactic@gmail.com
+admin0149
+
+----------- ADMIN LOGIN ---------------------
+
+username : admin
+password : 1234
+
+----------- MANAGER LOGIN ---------------------
+
+username : manager
+password : 1234

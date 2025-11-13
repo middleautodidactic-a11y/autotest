@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>จัดการงาน AUTODIDACTIC</title>
+<style>
+body {
+  font-family: sans-serif;
+  background: #fff;
+  color: #c00;
+  margin: 0;
+  padding: 20px;
+}
+label {
+  margin-right: 10px;
+}
+input[type=text], input[type=datetime-local] {
+  margin: 5px 0;
+}
+</style>
+</head>
+<body>
+
+<h2>แบบฟอร์มบันทึกงาน</h2>
+
+<form id="eventForm">
+  <label>รหัสงาน:</label><br>
+  <input type="text" id="jobNumber" placeholder="เช่น JOB001"><br><br>
+
+  <label>สถานที่:</label><br>
+  <input type="text" id="location" placeholder="เช่น โรงงาน A"><br><br>
+
+  <label>รายละเอียดงาน:</label><br>
+  <input type="text" id="details" placeholder="รายละเอียด..."><br><br>
+
+  <label>เวลาเริ่ม:</label><br>
+  <input type="datetime-local" id="start"><br><br>
+
+  <label>เวลาสิ้นสุด:</label><br>
+  <input type="datetime-local" id="end"><br><br>
+
+  <label>ผู้ปฏิบัติงาน:</label><br>
+  <div id="titleList">
+    <label><input type="checkbox" value="สมชาย"> สมชาย</label>
+    <label><input type="checkbox" value="สมหญิง"> สมหญิง</label>
+  </div><br>
+
+  <label>ผู้สั่งงาน:</label><br>
+  <div id="assignedByList">
+    <label><input type="checkbox" value="หัวหน้า A"> หัวหน้า A</label>
+    <label><input type="checkbox" value="หัวหน้า B"> หัวหน้า B</label>
+  </div><br>
+
+  <label>ลักษณะงาน:</label><br>
+  <label><input type="checkbox" value="ส่งมอบ" id="job-send"> ส่งมอบ</label>
+  <label><input type="checkbox" value="ฝึกอบรม"> ฝึกอบรม</label>
+  <label><input type="checkbox" value="ออกแสดงสินค้า"> ออกแสดงสินค้า</label>
+  <label><input type="checkbox" value="ตรวจเช็ค/ซ่อม"> ตรวจเช็ค/ซ่อม</label>
+  <label><input type="checkbox" value="Visit"> Visit</label>
+  <label><input type="checkbox" value="อื่นๆ"> อื่นๆ:</label>
+  <input type="text" id="otherJob" placeholder="ระบุ..."><br><br>
+
+</form>
+
+<script>
+// เมื่อกด checkbox "ส่งมอบ" → ไปหน้า report_send.html
+document.getElementById("job-send").addEventListener("change", e => {
+  if (e.target.checked) {
+    const location = document.getElementById("location").value;
+    const details = document.getElementById("details").value;
+    const start = document.getElementById("start").value;
+    const end = document.getElementById("end").value;
+    const workers = Array.from(document.querySelectorAll("#titleList input[type=checkbox]:checked")).map(cb => cb.value);
+    const assigners = Array.from(document.querySelectorAll("#assignedByList input[type=checkbox]:checked")).map(cb => cb.value);
+    const jobNumber = document.getElementById("jobNumber").value;
+
+    // สร้าง URL พร้อมข้อมูล
+    const url = new URL("report_send.html", window.location.href);
+    url.searchParams.set("jobNumber", jobNumber);
+    url.searchParams.set("location", location);
+    url.searchParams.set("details", details);
+    url.searchParams.set("start", start);
+    url.searchParams.set("end", end);
+    url.searchParams.set("workers", workers.join(", "));
+    url.searchParams.set("assigners", assigners.join(", "));
+    url.searchParams.set("jobTypes", "ส่งมอบ");
+
+    // เปิดหน้าใหม่
+    window.open(url, "_blank");
+
+    // ปิด checkbox หลังส่ง
+    setTimeout(() => { e.target.checked = false; }, 500);
+  }
+});
+</script>
+
+</body>
+</html>

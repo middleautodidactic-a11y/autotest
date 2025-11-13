@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ข้อมูลเบื้องต้นงานการตรวจซ่อม</title>
+<style>
+body {
+  font-family: "TH SarabunPSK", sans-serif;
+  font-size: 14px;
+  margin: 40px;
+  color: #000;
+}
+h3 {
+  text-align: center;
+  margin-bottom: 0;
+}
+p.right {
+  text-align: right;
+  margin-top: 5px;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 15px;
+}
+th, td {
+  border: 1px solid #000;
+  padding: 5px 6px;
+  vertical-align: top;
+}
+th {
+  text-align: center;
+  background: #f5f5f5;
+}
+input[type="text"] {
+  width: 100%;
+  border: none;
+  border-bottom: 1px dotted #000;
+  font-size: 14px;
+  font-family: "TH SarabunPSK", sans-serif;
+  outline: none;
+  background: transparent;
+}
+input[type="checkbox"] {
+  transform: scale(1.2);
+  margin-right: 4px;
+}
+.status { text-align: center; font-weight: bold; margin-top: 10px; color: green; }
+.btnH {
+  display: inline-block;
+  background: #c00;
+  color: #fff;
+  padding: 8px 16px;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+}
+.btnH:hover { background: #a00; }
+</style>
+</head>
+<body>
+
+<div>
+  <a href="home.html" class="btnH">กลับไปหน้าปฏิทิน</a>
+</div>
+
+<p class="right">
+  เอกสารแนบใบสั่งงาน<br>
+  ฝ่ายวิศวกรรมและฝึกอบรม
+</p>
+
+<h3>ข้อมูลเบื้องต้นงานตรวจซ่อม</h3><br><br>
+
+<div style="margin-bottom:20px;">
+  <label>เลขที่งาน (Job Number): </label>
+  <input type="text" id="jobNumberInput" readonly>
+</div>
+
+<table>
+  <tr><th>แผนดำเนินการ</th><th>วันที่</th><th>เวลา</th></tr>
+  <tr><td>ออกเดินทางจาก Office</td><td><input type="text" id="startDateInput"></td><td><input type="text" id="time1"></td></tr>
+  <tr><td>ตรวจซ่อม</td><td><input type="text" id="date2"></td><td><input type="text" id="time2"></td></tr>
+  <tr><td>เดินทางกลับ Office</td><td><input type="text" id="endDateInput"></td><td><input type="text" id="time4"></td></tr>
+</table>
+
+<table>
+  <tr>
+    <td>แผนการเดินทาง</td>
+    <td><label><input type="checkbox" id="car_company"> รถบริษัท</label></td>
+    <td><label><input type="checkbox" id="car_sales"> รถ Sales</label></td>
+    <td><label><input type="checkbox" id="bus"> รถประจำทาง</label></td>
+    <td><label><input type="checkbox" id="plane"> เครื่องบิน</label></td>
+  </tr>
+  <tr>
+    <td>Sales ไปด้วยหรือไม่:</td>
+    <td><label><input type="checkbox" id="sales_no"> ไม่ไป</label></td>
+    <td><label><input type="checkbox" id="sales_yes"> ไป</label></td>
+    <td><label><input type="checkbox" id="sales_together"> ไปด้วยกัน</label></td>
+    <td><label><input type="checkbox" id="sales_separate"> แยกกันไป</label></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td>รายการชุดฝึกที่ต้องการให้ตรวจซ่อม และรายละเอียดความเสียหายในเบื้องต้น :</td>
+  </tr>
+  <tr>
+    <td><input type="text" id="repair_detail"></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td>ชุดฝึกยังอยู่ในช่วงเวลารับประกันหรือไม่:</td>
+    <td>
+      <label><input type="checkbox" id="warranty_yes"> ใช่ รับประกันถึงวันที่ 
+        <input type="text" id="warranty_until">
+      </label>
+    </td>
+    <td><label><input type="checkbox" id="warranty_no"> ไม่ใช่</label></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th>ห้องที่วางชุดฝึกอยู่ที่ตึก</th>
+    <td><input type="text" id="building"></td>
+    <th>ชั้นที่</th>
+    <td><input type="text" id="floor"></td>
+  </tr>
+</table>
+
+<div id="statusMsg" class="status"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCua-GV6L-yz4cQNlSeQwRFNyOvzRQKO9Q",
+  authDomain: "events-92057.firebaseapp.com",
+  projectId: "events-92057",
+  storageBucket: "events-92057.appspot.com",
+  messagingSenderId: "33581889849",
+  appId: "1:33581889849:web:184cede4ec9f2eb363d0e8"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const params = new URLSearchParams(window.location.search);
+const jobNumber = params.get("jobNumber");
+if (jobNumber) document.getElementById("jobNumberInput").value = jobNumber;
+
+async function loadData() {
+  if (!jobNumber) return;
+
+  const q = query(collection(db, "report3"), where("jobNumber", "==", jobNumber));
+  const snap = await getDocs(q);
+  const statusMsg = document.getElementById("statusMsg");
+
+  if (snap.empty) {
+    statusMsg.textContent = "❌ ไม่พบข้อมูลงานนี้ใน Firestore (report3)";
+    statusMsg.style.color = "red";
+    return;
+  }
+
+  const data = snap.docs[0].data();
+
+  for (const [key, value] of Object.entries(data)) {
+    const el = document.getElementById(key);
+    if (!el) continue;
+    if (el.type === "checkbox") el.checked = value;
+    else el.value = value;
+  }
+
+  statusMsg.textContent = "✅ โหลดข้อมูลสำเร็จจาก Firestore (report3)";
+  statusMsg.style.color = "green";
+
+  // 🔒 ล็อก input ทั้งหมด
+  document.querySelectorAll("input").forEach(el => {
+    el.readOnly = true;
+    el.disabled = true;
+  });
+}
+const start = params.get("start") || "";
+const end = params.get("end") || "";
+
+// ✅ ใส่ค่าใน input (ถ้ามีฟิลด์ในฟอร์ม)
+document.getElementById("jobNumberInput").value = jobNumber;
+document.getElementById("startDateInput").value = start;
+document.getElementById("endDateInput").value = end;
+loadData();
+</script>
+
+</body>
+</html>

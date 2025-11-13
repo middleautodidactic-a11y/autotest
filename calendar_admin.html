@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>📅 ปฏิทินงาน (Admin)</title>
+
+<!-- FullCalendar -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/locales-all.min.js"></script>
+
+<style>
+/* ===== Global ===== */
+body { 
+  font-family: 'Prompt', sans-serif; 
+  background: #f9f9f9; 
+  color: #333; 
+  margin:0; 
+  padding:0; 
+}
+
+/* ===== Header ===== */
+header {
+  background: linear-gradient(90deg, #c00, #f44336);
+  color: #fff;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+header nav a {
+  color: #fff;
+  background: rgba(0,0,0,0.2);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  margin-left: 8px;
+  transition: 0.3s;
+}
+header nav a:hover {
+  background: rgba(255,255,255,0.3);
+}
+.logo-container img {
+  width: 50px; 
+  height: auto;
+  background: rgba(255,255,255,0.8); 
+  padding: 5px;
+  border-radius: 8px;
+}
+
+/* ===== Buttons ===== */
+#btnAddEvent {
+  display: inline-block;
+  margin: 15px auto;
+  padding: 10px 20px;
+  background: #c00;
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-size: 15px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+  text-decoration: none;
+}
+#btnAddEvent:hover { background: #a00; }
+
+/* ===== Calendar ===== */
+#calendar {
+  max-width: 1000px;
+  margin: 30px auto;
+  border-radius: 12px;
+  background: #fff;
+  padding: 15px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+  border: 1px solid #f0f0f0;
+  transition: transform 0.3s;
+}
+#calendar:hover { transform: translateY(-2px); }
+
+.fc .fc-toolbar-title { 
+  color:#c00; 
+  font-weight:bold; 
+  font-size:18px; 
+}
+.fc .fc-daygrid-event {
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 0.95em;
+  overflow: hidden;
+  white-space: nowrap;
+  color: #fff !important;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+.fc .fc-daygrid-event:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.fc .fc-button-primary {
+  background:#c00; 
+  border:none; 
+  color:#fff; 
+  border-radius:6px; 
+  font-size:13px; 
+  padding:5px 10px; 
+}
+.fc .fc-button-primary:hover { background:#a00; }
+
+/* ===== Footer ===== */
+footer {
+  background: linear-gradient(90deg, #c00, #f44336);
+  color: #fff;
+  text-align: center;
+  padding: 14px 20px;
+  font-size: 14px;
+  box-shadow: 0 -3px 6px rgba(0,0,0,0.1);
+}
+/* ====== ปุ่ม Dropdown ====== */
+/* ===== Dropdown (แสดงด้านซ้าย) ===== */
+.dropdown {
+  position: relative;
+  display: block;
+  left: 0; /* ให้ชิดซ้าย */
+}
+
+.dropbtn {
+  background-color: #c00;
+  color: white;
+  padding: 10px 16px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  left: 0; /* ✅ แสดงเมนูทางซ้าย */
+  top: 100%; /* แสดงใต้ปุ่ม */
+  background-color: #fff;
+  min-width: 180px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  border-radius: 8px;
+  z-index: 1000;
+}
+
+.dropdown-content a {
+  color: #333;
+  padding: 10px 16px;
+  text-decoration: none;
+  display: block;
+  transition: background 0.2s;
+}
+
+.dropdown-content a:hover {
+  background-color: #f0f0f0;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+
+/* ====== Responsive (มือถือ / จอเล็ก) ====== */
+@media (max-width: 600px), (orientation: portrait), (orientation: landscape) {
+  header {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: clamp(10px, 2vw, 20px);
+    gap: clamp(10px, 2vw, 20px);
+  }
+
+  /* ซ่อนปุ่มแนวนอน */
+  .nav-buttons {
+    display: none;
+  }
+
+  /* แสดง dropdown */
+  .dropdown {
+    display: block;
+    left: 0;
+  }
+
+  #calendar {
+    max-width: 900px;
+    padding: clamp(12px, 2vw, 24px);
+  }
+  footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    font-size: 12px;
+    padding: 10px;
+  }
+}
+
+/* ====== Desktop (≥1200px) ====== */
+@media (min-width: 1200px) {
+  #calendar {
+    max-width: 1100px;
+    padding: 24px;
+  }
+
+  /* ✅ แสดงปุ่มแนวนอน */
+  .nav-buttons {
+    display: flex;
+    gap: 12px;
+  }
+
+  /* ✅ ซ่อนปุ่มเมนู (dropdown) */
+  .dropdown {
+    display: none;
+  }
+}
+
+
+</style>
+</head>
+<body>
+
+<header>
+
+  <div class="logo-container">
+    <img src="ad_logo-Photoroom.png" a href="index.html">
+  </div>
+  <div style="font-size:18px;">📅 ปฏิทินงาน (SALES & ADMIN)</div>
+  
+  <!-- Dropdown Menu สำหรับมือถือ -->
+  <div class="dropdown">
+    <button class="dropbtn">☰ เมนู</button>
+    <div class="dropdown-content">
+      <a href="manage.html">➕ เพิ่มงาน</a>
+      <a href="loginAM.html">📋 จัดการงาน</a>
+      <a href="index.html">🚪 ออกจากระบบ</a>
+    </div>
+  </div>
+
+  <!-- ปุ่มแนวนอน (จะซ่อนเมื่อจอเล็ก) -->
+  <nav class="nav-buttons">
+    <a href="manage.html" class="button">➕ เพิ่มงาน</a>
+    <a href="admin.html" class="button">📋 จัดการงาน</a>
+    <a href="index.html" class="button">🚪 ออกจากระบบ</a>
+  </nav>
+</header>
+
+<div id="calendar"></div>
+
+<footer>&copy; 2025 ระบบจองบุคคลออกปฏิบัติงาน | AUTODIDACTIC</footer>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCua-GV6L-yz4cQNlSeQwRFNyOvzRQKO9Q",
+  authDomain: "events-92057.firebaseapp.com",
+  projectId: "events-92057",
+  storageBucket: "events-92057.appspot.com",
+  messagingSenderId: "33581889849",
+  appId: "1:33581889849:web:184cede4ec9f2eb363d0e8"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+document.addEventListener("DOMContentLoaded", async function() {
+  const calendarEl = document.getElementById("calendar");
+
+  const calendar = new FullCalendar.Calendar(calendarEl, {
+    locale: "th",
+    initialView: window.innerWidth < 600 ? "listWeek" : "dayGridMonth",
+    headerToolbar: { 
+      left: "prev,next today", 
+      center: "title", 
+      right: "dayGridMonth,timeGridWeek,listWeek" 
+    },
+    eventContent: function(arg) {
+      const data = arg.event.extendedProps;
+      const el = document.createElement("div");
+      if (data.type === "leave") {
+        el.innerHTML = `<div style="background:#E3F2FD; border-left:5px solid #2196F3; padding:3px; border-radius:5px;">
+          <strong>🏖 ${arg.event.title}</strong><br>
+          <small>เหตุผล: ${data.reason || '-'}</small></div>`;
+      } else {
+        el.innerHTML = `<strong>${arg.event.title}</strong><br>
+          <small>📍 ${data.location || "-"}</small><br>
+          <small>🧰 ${data.jobTypes || "-"}</small><br>
+          <small>📌 ${data.status || "-"}</small>`;
+      }
+      return { domNodes: [el] };
+    },
+
+    // ✅ เมื่อคลิกอีเวนต์ในปฏิทิน
+    eventClick: function(info) {
+  const event = info.event;
+  const id = event.id;
+  window.location.href = `manage.html?id=${id}`;
+},
+
+    windowResize: function(){
+      if(window.innerWidth < 600){
+        calendar.changeView('listWeek');
+      } else {
+        calendar.changeView('dayGridMonth');
+      }
+    }
+  });
+
+  // Load events from Firebase
+  const events = [];
+  try {
+    const eventSnap = await getDocs(collection(db,"events"));
+    const leaveSnap = await getDocs(collection(db,"leaves"));
+
+    function addOneDay(dateStr){
+      if(!dateStr) return "";
+      const d = new Date(dateStr);
+      d.setDate(d.getDate()+1);
+      return d.toISOString().split("T")[0];
+    }
+
+    eventSnap.forEach(docItem=>{
+      const data = docItem.data();
+      let color="gray";
+      if(data.status==="อนุมัติ") color="#E3C565";
+      else if(data.status==="เรียบร้อย") color="green";
+      else if(data.status==="ไม่เรียบร้อย") color="darkred";
+
+      events.push({
+        id: docItem.id,
+        title: Array.isArray(data.workers)?data.workers.join(", "):(data.workers||"ไม่ระบุ"),
+        start: data.start||"",
+        end: addOneDay(data.end),
+        location: data.location||"",
+        details: data.details||"",
+        assignedBy: Array.isArray(data.assigners)?data.assigners.join(", "):(data.assigners||"-"),
+        jobTypes: Array.isArray(data.jobTypes)?data.jobTypes.join(", "):(data.jobTypes||"-"),
+        jobNumber: data.jobNumber||"-",
+        status: data.status||"รออนุมัติ",
+        remark: data.remark||"",
+        backgroundColor: color,
+        borderColor: color,
+        type: "event"
+      });
+    });
+
+    leaveSnap.forEach(docItem=>{
+      const data = docItem.data();
+      events.push({
+        id:"leave-"+docItem.id,
+        title:data.name||"-",
+        start:data.start||"",
+        end:addOneDay(data.end),
+        backgroundColor:"#2196F3",
+        borderColor:"#2196F3",
+        textColor:"#000",
+        reason:data.reason||"",
+        type:"leave",
+        allDay:true
+      });
+    });
+
+    calendar.addEventSource(events);
+    calendar.render();
+
+  } catch(err){
+    console.error("❌ โหลดข้อมูลจาก Firebase ไม่สำเร็จ:",err);
+    calendar.render();
+  }
+
+});
+</script>
+
+</body>
+</html>
