@@ -181,28 +181,23 @@ footer {
 /* ====== Responsive: Tablet (≥680px) ====== */
 @media (max-width: 600px), (orientation: portrait), (orientation: landscape) {
   header {
-    flex-direction: row;   /* แสดงแนวนอน */
+    flex-direction: row;
     justify-content: space-between;
     padding: clamp(10px, 2vw, 20px);
     gap: clamp(10px, 2vw, 20px);
   }
 
   #calendar {
-    max-width: 400px;
+    max-width: 900px;
     padding: clamp(12px, 2vw, 24px);
   }
   footer {
-  background: linear-gradient(90deg, #c00, #f44336);
-  color: #fff;
-  text-align: center;
-  padding: 14px 20px;
-  font-size: 14px;
-  box-shadow: 0 -3px 6px rgba(0,0,0,0.1);
-}
-
-  .modal-content {
-    max-width: 450px;
-    margin-top: 5%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    font-size: 12px;
+    padding: 10px;
   }
 }
 
@@ -223,7 +218,7 @@ footer {
   </div>
   <div style="font-size:18px;">📅 ปฏิทินงาน</div>
   <nav>
-    <a href="manager.html">กลับไปหน้า Manager</a>
+    <a href="manager.html">🚪 กลับไปหน้า Manager</a>
   </nav>
 </header>
 
